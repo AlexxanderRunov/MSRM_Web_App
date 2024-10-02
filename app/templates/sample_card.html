@@ -1,0 +1,59 @@
+{% load static %}
+
+
+{% if "http://localhost:8000/missions/" in request.build_absolute_uri or "http://127.0.0.1:8000/missions/" in request.build_absolute_uri %}
+
+    <div class="card w-100 mb5">
+         <div class="row g-0">
+            <div class="col-md-6 d-flex justify-center">
+                <img src="{{ sample.image }}"  >
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h5 class="card-title">{{ sample.name }} </h5>
+                    <p class="card-text">Дата обнаружения: {{ sample.date_discovery }}</p>
+                    <div class="form-group">
+                        <label class="form-label">Порядковый номер</label>
+                        <input disabled class="form-control" style="width: 150px" value="{{ sample.value }}">
+                    </div>
+                    <a href="/samples/{{ sample.id }}/" class="btn btn-primary" style="width: 100px">
+                        Открыть
+                    </a>
+                </div>
+            </div>
+         </div>
+    </div>
+
+{% else %}
+
+    <div class="card">
+
+        <img src="{{ sample.image }}" class="sample-preview" alt=""/>
+
+        <div class="card-body" >
+
+            <div class="card-info">
+
+                <h5 class="card-title">{{ sample.name }}</h5>
+
+                <p class="card-text">Дата обнаружения: {{ sample.date_discovery }}</p>
+
+            </div>
+
+            <div class="card-btns">
+
+                <a href="/samples/{{ sample.id }}/" class="btn btn-primary center">
+                    Открыть
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+
+

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="container sample-page">
+
+        <div class="row">
+            <div class="col-6">
+                <img src="{{ sample.image }}" class="sample-image" alt=""/>
+            </div>
+            <div class="col-6 d-flex flex-md-column gap-md-3">
+
+                <h1>{{ sample.name }}</h1>
+
+                <span>Описание: {{ sample.description }}</span>
+
+                <span>Дата обнаружения: {{ sample.date_discovery }}</span>
+
+                <a href="/" class="btn btn-primary my-4 w-25 return-btn">
+                    Домой
+                </a>
+
+            </div>
+        </div>
+
+    </main>
+{% endblock content %}
