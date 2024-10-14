@@ -54,15 +54,15 @@ draft_mission = {
     "samples": [
         {
             "id": 1,
-            "value": 1
+            "order": 1
         },
         {
             "id": 2,
-            "value": 2
+            "order": 2
         },
         {
             "id": 3,
-            "value": 3
+            "order": 3
         }
     ]
 }
@@ -123,7 +123,7 @@ def sample(request, sample_id):
 def mission(request, mission_id):
     mission = getMissionById(mission_id)
     samples = [
-        {**getSampleById(sample["id"]), "value": sample["value"]}
+        {**getSampleById(sample["id"]), "order": sample["order"]}
         for sample in mission["samples"]
     ]
 
