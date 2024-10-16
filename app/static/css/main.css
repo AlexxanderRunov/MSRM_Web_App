@@ -1,8 +1,10 @@
 :root {
-    --root_bg: #fff;
-    --text_color: #000;
+    --root-bg: #fff;
+    --text-color: #000;
     --primary-color: #D83933;
     --primary-color__hover: hsl(from var(--primary-color) h s calc(l - 10));
+    --secondary-color: #6c757d;
+    --secondary-color__hover: hsl(from var(--secondary-color) h s calc(l - 10));
 
     --header-bg: #000;
     --header-color: #fff;
@@ -17,6 +19,13 @@
     --primary-btn-border--hover: var(--primary-color__hover);
     --primary-btn-color: #fff;
     --primary-btn-color--hover: #fff;
+
+    --add-btn-bg: var(--secondary-color);
+    --add-btn-bg--hover: var(--secondary-color__hover);
+    --add-btn-border: var(--secondary-color);
+    --add-btn-border--hover: var(--secondary-color__hover);
+    --add-btn-color: #fff;
+    --add-btn-color--hover: #fff;
 
     --bin-bg: var(--primary-color);
     --bin-bg--hover: var(--primary-color__hover);
@@ -46,8 +55,8 @@
 }
 
 .wrapper {
-    color: var(--text_color);
-    background: var(--root_bg);
+    color: var(--text-color);
+    background: var(--root-bg);
     min-height: 100vh;
 }
 
@@ -55,13 +64,42 @@
     background-color: var(--header-bg);
 }
 
-.navbar-brand{
+.nav-link, .navbar-brand{
     color: var(--header-color) !important;
+}
+
+.nav-link:hover, .navbar-brand:hover{
+    color: hsl(from var(--header-color) h s calc(l - 10)) !important;
 }
 
 .navbar .title {
     display: flex !important;
     align-items: center !important;
+}
+
+.bin.btn.btn-primary {
+    position: relative !important;
+    background-color: var(--bin-bg) !important;
+    border-color: var(--bin-border) !important;
+    color: var(--bin-color) !important;
+}
+
+.bin.btn.btn-primary:hover  {
+    background-color: var(--bin-bg--hover) !important;
+    border-color: var(--bin-border--hover) !important;
+    color: var(--bin-color--hover) !important;
+}
+
+.add-btn.btn-secondary {
+    background-color: var(--add-btn-bg) !important;
+    border-color: var(--add-btn-border) !important;
+    color: var(--add-btn-color) !important;
+}
+
+.add-btn.btn-secondary:hover {
+    background-color: var(--add-btn-bg--hover) !important;
+    border-color: var(--add-btn-border--hover) !important;
+    color: var(--add-btn-color--hover) !important;
 }
 
 .cards-wrapper {
@@ -113,7 +151,7 @@ main {
     padding: 25px 0;
 }
 
-.badge {
+.badge.bg-primary {
     position: absolute !important;
     top: -10px !important;
     right: -15px;
@@ -140,14 +178,16 @@ main {
     width: 80%;
 }
 
-.btn-primary {
+.btn.btn-primary {
     background-color: var(--primary-btn-bg) !important;
-    border-color: var(--primary-btn-bg) !important;
+    border-color: var(--primary-btn-border) !important;
+    color: var(--primary-btn-color) !important;
 }
 
-.btn-primary:hover {
-    background-color: hsl(from var(--primary-btn-bg) h s calc(l - 10)) !important;
-    border-color: hsl(from var(--primary-btn-bg) h s calc(l - 10)) !important;
+.btn.btn-primary:hover {
+    background-color: var(--primary-btn-bg--hover) !important;
+    border-color: var(--primary-btn-border--hover) !important;
+    color: var(--primary-btn-color--hover) !important;
 }
 
 .card-btns {
@@ -155,8 +195,8 @@ main {
     justify-content: center;
 }
 
-.card-btns .btn {
-    width: 50%;
+.delete-draft-mission-btn {
+    width: 150px;
 }
 
 .search-btn.btn.btn-primary {
@@ -183,28 +223,11 @@ main {
     color: var(--return-color--hover) !important;
 }
 
-.btn.btn-primary {
-    position: relative !important;
-    background-color: var(--primary-btn-bg) !important;
-    border-color: var(--primary-btn-border) !important;
-    color: var(--primary-btn-color) !important;
+.btn:focus {
+    box-shadow: none !important;
 }
 
-.btn.btn-primary:hover {
-    background-color: var(--primary-btn-bg--hover) !important;
-    border-color: var(--primary-btn-border--hover) !important;
-    color: var(--primary-btn-color--hover) !important;
-}
-
-.bin.btn.btn-primary {
-    position: relative !important;
-    background-color: var(--bin-bg) !important;
-    border-color: var(--bin-border) !important;
-    color: var(--bin-color) !important;
-}
-
-.bin.btn.btn-primary:hover  {
-    background-color: var(--bin-bg--hover) !important;
-    border-color: var(--bin-border--hover) !important;
-    color: var(--bin-color--hover) !important;
+.bin.btn.btn-secondary.disabled  {
+    cursor: not-allowed !important;
+    pointer-events: all !important;
 }

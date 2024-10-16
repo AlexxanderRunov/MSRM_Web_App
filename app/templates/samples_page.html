@@ -2,7 +2,9 @@
 
 {% block content %}
     <main class="container">
+
         <div class="row d-flex justify-content-between">
+
             <div class="col md-8">
                 <form class="search-bar" action="/" method="GET">
                     <div class="row">
@@ -10,27 +12,26 @@
                             <input type="text" class="form-control" placeholder="Введите название" name="sample_name" value="{{ sample_name }}">
                         </div>
                         <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary w-100 search-btn">Поиск</button>
+                            <button type="submit" class="search-btn btn btn-primary w-100">Поиск</button>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="col md-4 justify-end">
-                <a href="/missions/{{ draft_mission.id }}/" class="w-25">
-                    <button type="submit" class="bin btn btn-primary position-relative w-100">
-                        Корзина
-                        <div class="badge position-absolute badge rounded-pill">
-                            {{ samples_count }}
-                        </div>
-                    </button>
-                </a>
-            </div>
+
+             {% include "bin.html" %}
+
         </div>
+
         <div class="cards-wrapper">
+
             {% for sample in samples %}
+
                 {% include "sample_card.html" %}
+
             {% endfor %}
+
         </div>
+
     </main>
 {% endblock content %}
 

@@ -1,71 +1,60 @@
 {% load static %}
 
-
 {% if "http://localhost:8000/missions/" in request.build_absolute_uri or "http://127.0.0.1:8000/missions/" in request.build_absolute_uri %}
-
     <div class="card w-100 mb-3">
-    <div class="row g-0">
-        
-        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-            <div class="form-group">
-                <label class="form-label">Порядковый номер</label>
-                <input disabled class="form-control" style="width: 150px" value="{{ sample.order }}">
-            </div>
-        </div>
-
-        <div class="col-md-4 d-flex justify-content-center align-items-center">
-            <img src="{{ sample.image }}" class="img-fluid">
-        </div>
-
-        <div class="col-md-2 d-flex flex-column justify-content-center">
-            <h5 class="card-title text-center">{{ sample.name }} </h5>
-        </div>
-
-        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-            <p class="card-text">Дата обнаружения:</p>
-             <p class="card-text">{{ sample.date_discovery }}</p>
-        </div>
-
-        <div class="col-md-2 d-flex justify-content-center align-items-center">
-            <a href="/samples/{{ sample.id }}/" class="btn btn-primary" style="width: 100px">
-                Открыть
-            </a>
-        </div>
-    </div>
-</div>
-
-
-
-{% else %}
-
-    <div class="card">
-
-        <img src="{{ sample.image }}" class="sample-preview" alt=""/>
-
-        <div class="card-body">
-
-            <div class="card-info">
-
-                <h5 class="card-title">{{ sample.name }}</h5>
-
-                <p class="card-text">Дата обнаружения: {{ sample.date_discovery }}</p>
-
+        <div class="row g-0">
+            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+                <div class="form-group">
+                    <label class="form-label">Порядковый номер</label>
+                    {% if sample.order %}
+                        <input placeholder="Введите порядковый номер" disabled type="text" class="form-control" style="width: 150px" value="{{ sample.order }}">
+                    {% else %}
+                        <input placeholder="Введите порядковый номер" disabled type="text" class="form-control" style="width: 150px">
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="card-btns">
+            <div class="col-md-4 d-flex justify-content-center align-items-center">
+                <img src="{{ sample.get_image }}" class="img-fluid">
+            </div>
 
-                <a href="/samples/{{ sample.id }}/" class="btn btn-primary center">
+            <div class="col-md-2 d-flex flex-column justify-content-center">
+                <h5 class="card-title text-center">{{ sample.name }}</h5>
+            </div>
+
+            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+                <p class="card-text">Дата обнаружения:</p>
+                <p class="card-text">{{ sample.date_discovery }}</p>
+            </div>
+
+            <div class="col-md-2 d-flex justify-content-center align-items-center">
+                <a href="/samples/{{ sample.id }}/" class="btn btn-primary" style="width: 100px">
                     Открыть
                 </a>
-
             </div>
-
         </div>
-
     </div>
-
+{% else %}
+    <div class="card">
+        <img src="{{ sample.get_image }}" class="sample-preview" alt=""/>
+        <div class="card-body">
+            <div class="card-info">
+                <h5 class="card-title">{{ sample.name }}</h5>
+                <p class="card-text">Дата обнаружения: {{ sample.date_discovery }}</p>
+            </div>
+            <div class="row card-btns">
+                <div class="col d-flex justify-content-center flex-grow-1">
+                    <a href="/samples/{{ sample.id }}" class="btn btn-primary">
+                        Открыть
+                    </a>
+                </div>
+                <form method="post" action="{% url 'add_sample_to_draft_mission' sample.id %}" class="col d-flex justify-content-center">
+                    {% csrf_token %}
+                    <button class="add-btn btn btn-secondary" type="submit">
+                        Добавить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endif %}
-
-
-
-
