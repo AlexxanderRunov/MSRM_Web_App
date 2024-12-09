@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7417e792-0987-4f37-884a-10bc63e7a4e1",
+		"_postman_id": "f739ba00-a119-4ace-bb04-304902b207db",
 		"name": "Lab3",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33669280"
@@ -16,7 +16,7 @@
 				"header": [
 					{
 						"key": "Cookie",
-						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI5NDQyOTgwLCJpYXQiOjE3MjkzNTY1ODAsInVzZXJfaWQiOjF9.TJk9mOWV4FTWqBFa91g50x3hFX3C82i6UWHyEqN3fxI",
+						"value": "sit7702b2pj2lic93d2b1ad6ukohnr6v",
 						"type": "text"
 					}
 				],
@@ -117,7 +117,7 @@
 			"response": []
 		},
 		{
-			"name": "Удаление продакта",
+			"name": "Удаление образца",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -208,7 +208,7 @@
 				"header": [
 					{
 						"key": "Cookie",
-						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI5NDQzOTM4LCJpYXQiOjE3MjkzNTc1MzgsInVzZXJfaWQiOjF9.3n8y8kiYVra079CUQwT_gRMC5V5CvSRus2Ys5hD_x7s",
+						"value": "mfg0uc3mnlmv2mwthdjznlkw3pjcjh2v",
 						"type": "text"
 					}
 				],
@@ -328,7 +328,7 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/missions/32/update_status_user/",
+					"raw": "http://localhost:8000/api/missions/31/update_status_user/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -337,7 +337,7 @@
 					"path": [
 						"api",
 						"missions",
-						"32",
+						"31",
 						"update_status_user",
 						""
 					]
@@ -360,7 +360,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/missions/32/update_status_admin/",
+					"raw": "http://localhost:8000/api/missions/31/update_status_admin/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -369,7 +369,7 @@
 					"path": [
 						"api",
 						"missions",
-						"32",
+						"31",
 						"update_status_admin",
 						""
 					]
@@ -462,7 +462,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"user\",\r\n    \"password\": \"1234\"\r\n}",
+					"raw": "{\r\n    \"username\": \"root\",\r\n    \"password\": \"1234\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -525,7 +525,7 @@
 				"header": [
 					{
 						"key": "Cookie",
-						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI5NDQzOTM4LCJpYXQiOjE3MjkzNTc1MzgsInVzZXJfaWQiOjF9.3n8y8kiYVra079CUQwT_gRMC5V5CvSRus2Ys5hD_x7s",
+						"value": "mfg0uc3mnlmv2mwthdjznlkw3pjcjh2v",
 						"type": "text"
 					}
 				],

@@ -1,11 +1,13 @@
-import requests
+import random
+from datetime import datetime, timedelta
+
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.db import transaction
 
 from .serializers import *
 
@@ -31,13 +33,13 @@ def search_samples(request):
     if sample_name:
         samples = samples.filter(name__icontains=sample_name)
 
-    serializer = SampleSerializer(samples, many=True)
-
+    serializer = SamplesSerializer(samples, many=True)
+    
     draft_mission = get_draft_mission()
 
     resp = {
         "samples": serializer.data,
-        "samples_count": len(serializer.data),
+        "samples_count": SampleMission.objects.filter(mission=draft_mission).count() if draft_mission else None,
         "draft_mission": draft_mission.pk if draft_mission else None
     }
 
@@ -50,7 +52,7 @@ def get_sample_by_id(request, sample_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     sample = Sample.objects.get(pk=sample_id)
-    serializer = SampleSerializer(sample, many=False)
+    serializer = SampleSerializer(sample)
 
     return Response(serializer.data)
 
@@ -62,14 +64,9 @@ def update_sample(request, sample_id):
 
     sample = Sample.objects.get(pk=sample_id)
 
-    image = request.data.get("image")
-    if image is not None:
-        sample.image = image
-        sample.save()
-
     serializer = SampleSerializer(sample, data=request.data, partial=True)
 
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         serializer.save()
 
     return Response(serializer.data)
@@ -77,7 +74,11 @@ def update_sample(request, sample_id):
 
 @api_view(["POST"])
 def create_sample(request):
-    Sample.objects.create()
+    serializer = SampleSerializer(data=request.data, partial=False)
+
+    serializer.is_valid(raise_exception=True)
+
+    Sample.objects.create(**serializer.validated_data)
 
     samples = Sample.objects.filter(status=1)
     serializer = SampleSerializer(samples, many=True)
@@ -121,6 +122,7 @@ def add_sample_to_mission(request, sample_id):
     item = SampleMission.objects.create()
     item.mission = draft_mission
     item.sample = sample
+    item.order = SampleMission.objects.count()
     item.save()
 
     serializer = MissionSerializer(draft_mission)
@@ -225,14 +227,15 @@ def update_status_admin(request, mission_id):
     if mission.status != 2:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    if request_status == 3:
+        mission.success = random.randint(0, 1)
+
     mission.date_complete = timezone.now()
     mission.status = request_status
     mission.moderator = get_moderator()
     mission.save()
 
-    serializer = MissionSerializer(mission, many=False)
-
-    return Response(serializer.data)
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["DELETE"])
@@ -261,16 +264,17 @@ def delete_sample_from_mission(request, mission_id, sample_id):
     item = SampleMission.objects.get(mission_id=mission_id, sample_id=sample_id)
     item.delete()
 
-    mission = Mission.objects.get(pk=mission_id)
+    remaining_items = SampleMission.objects.filter(mission_id=mission_id).order_by('order')
+    for index, remaining_item in enumerate(remaining_items):
+        remaining_item.order = index + 1
+        remaining_item.save()
 
-    serializer = MissionSerializer(mission, many=False)
-    samples = serializer.data["samples"]
+    data = [
+        SampleItemSerializer(item.sample, context={"order": item.order}).data
+        for item in remaining_items
+    ]
 
-    if len(samples) == 0:
-        mission.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    return Response(samples)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["PUT"])
@@ -279,13 +283,36 @@ def update_sample_in_mission(request, mission_id, sample_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     item = SampleMission.objects.get(sample_id=sample_id, mission_id=mission_id)
+    current_order = item.order
 
-    serializer = SampleMissionSerializer(item, data=request.data,  partial=True)
+    # Находим следующий элемент по порядку
+    next_item = SampleMission.objects.filter(
+        mission_id=mission_id, order=current_order + 1
+    ).first()
 
-    if serializer.is_valid():
-        serializer.save()
+    if not next_item:
+        # Если следующего элемента нет, нельзя увеличить порядок
+        return Response({"detail": "Cannot move item further down."}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(serializer.data)
+    # Используем транзакцию для безопасного изменения данных
+    with transaction.atomic():
+        # Меняем местами порядки текущего элемента и следующего
+        next_item_order = next_item.order
+        item.order = next_item_order
+        next_item.order = current_order
+
+        item.save()
+        next_item.save()
+
+    # Получаем обновленные данные обоих элементов
+    updated_items = SampleMission.objects.filter(
+        id__in=[item.id, next_item.id]
+    ).order_by("order")
+
+    # Сериализуем обновленные элементы
+    serialized_data = SampleMissionSerializer(updated_items, many=True).data
+
+    return Response(serialized_data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])

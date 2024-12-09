@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import *
 
 
-class SampleSerializer(serializers.ModelSerializer):
+class SamplesSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, sample):
@@ -14,62 +14,41 @@ class SampleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sample
+        fields = ("id", "name", "status", "date_discovery", "image")
+
+
+class SampleSerializer(SamplesSerializer):
+    class Meta(SamplesSerializer.Meta):
         fields = "__all__"
 
 
-class SampleItemSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+class MissionsSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField(read_only=True)
+    moderator = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Mission
+        fields = "__all__"
+
+
+class MissionSerializer(MissionsSerializer):
+    samples = serializers.SerializerMethodField()
+            
+    def get_samples(self, mission):
+        items = SampleMission.objects.filter(mission=mission).order_by('order')
+        
+        return [SampleItemSerializer(item.sample, context={"order": item.order}).data for item in items]
+
+
+class SampleItemSerializer(SampleSerializer):
     order = serializers.SerializerMethodField()
 
-    def get_image(self, sample):
-        if sample.image:
-            return sample.image.url.replace("minio", "localhost", 1)
-
-        return "http://localhost:9000/images/default.png"
-
-    def get_order(self, sample):
+    def get_order(self, _):
         return self.context.get("order")
 
     class Meta:
         model = Sample
-        fields = ("id", "name", "image", "order")
-
-
-class MissionSerializer(serializers.ModelSerializer):
-    samples = serializers.SerializerMethodField()
-    owner = serializers.SerializerMethodField()
-    moderator = serializers.SerializerMethodField()
-
-    def get_owner(self, mission):
-        return mission.owner.username
-
-    def get_moderator(self, mission):
-        if mission.moderator:
-            return mission.moderator.username
-            
-    def get_samples(self, mission):
-        items = SampleMission.objects.filter(mission=mission)
-        return [SampleItemSerializer(item.sample, context={"order": item.order}).data for item in items]
-
-    class Meta:
-        model = Mission
-        fields = '__all__'
-
-
-class MissionsSerializer(serializers.ModelSerializer):
-    owner = serializers.SerializerMethodField()
-    moderator = serializers.SerializerMethodField()
-
-    def get_owner(self, mission):
-        return mission.owner.username
-
-    def get_moderator(self, mission):
-        if mission.moderator:
-            return mission.moderator.username
-
-    class Meta:
-        model = Mission
-        fields = "__all__"
+        fields = ("id", "name", "status", "date_discovery", "image", "order")
 
 
 class SampleMissionSerializer(serializers.ModelSerializer):
@@ -81,7 +60,7 @@ class SampleMissionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username')
+        fields = ('id', 'email', 'username', "is_superuser")
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

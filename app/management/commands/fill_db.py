@@ -1,10 +1,9 @@
-import random
-
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from minio import Minio
 
-from ...models import *
-from .utils import random_date, random_timedelta
+from .utils import *
+from app.models import *
 
 
 def add_users():
@@ -14,8 +13,6 @@ def add_users():
     for i in range(1, 10):
         User.objects.create_user(f"user{i}", f"user{i}@user.com", "1234", first_name=f"user{i}", last_name=f"user{i}")
         User.objects.create_superuser(f"root{i}", f"root{i}@root.com", "1234", first_name=f"user{i}", last_name=f"user{i}")
-
-    print("Пользователи созданы")
 
 
 def add_samples():
@@ -61,26 +58,20 @@ def add_samples():
         image="6.png"
     )
 
-    client = Minio("minio:9000", "minio", "minio123", secure=False)
-    client.fput_object('images', '1.png', "app/static/images/1.png")
-    client.fput_object('images', '2.png', "app/static/images/2.png")
-    client.fput_object('images', '3.png', "app/static/images/3.png")
-    client.fput_object('images', '4.png', "app/static/images/4.png")
-    client.fput_object('images', '5.png', "app/static/images/5.png")
-    client.fput_object('images', '6.png', "app/static/images/6.png")
-    client.fput_object('images', 'default.png', "app/static/images/default.png")
+    client = Minio(settings.MINIO_ENDPOINT,
+                   settings.MINIO_ACCESS_KEY,
+                   settings.MINIO_SECRET_KEY,
+                   secure=settings.MINIO_USE_HTTPS)
 
-    print("Услуги добавлены")
+    for i in range(1, 7):
+        client.fput_object(settings.MINIO_MEDIA_FILES_BUCKET, f'{i}.png', f"app/static/images/{i}.png")
+
+    client.fput_object(settings.MINIO_MEDIA_FILES_BUCKET, 'default.png', "app/static/images/default.png")
 
 
 def add_missions():
     users = User.objects.filter(is_staff=False)
     moderators = User.objects.filter(is_staff=True)
-
-    if len(users) == 0 or len(moderators) == 0:
-        print("Заявки не могут быть добавлены. Сначала добавьте пользователей с помощью команды add_users")
-        return
-
     samples = Sample.objects.all()
 
     for _ in range(30):
@@ -90,15 +81,17 @@ def add_missions():
 
     add_mission(1, samples, users[0], moderators)
     add_mission(2, samples, users[0], moderators)
-
-    print("Заявки добавлены")
+    add_mission(3, samples, users[0], moderators)
+    add_mission(4, samples, users[0], moderators)
+    add_mission(5, samples, users[0], moderators)
 
 
 def add_mission(status, samples, owner, moderators):
     mission = Mission.objects.create()
     mission.status = status
 
-    if mission.status in [3, 4]:
+    if status in [3, 4]:
+        mission.moderator = random.choice(moderators)
         mission.date_complete = random_date()
         mission.date_formation = mission.date_complete - random_timedelta()
         mission.date_created = mission.date_formation - random_timedelta()
@@ -106,19 +99,22 @@ def add_mission(status, samples, owner, moderators):
         mission.date_formation = random_date()
         mission.date_created = mission.date_formation - random_timedelta()
 
-    mission.owner = owner
-    mission.moderator = random.choice(moderators)
+    if status == 3:
+        mission.success = random.randint(0, 1)
 
     mission.name = "MSR-1"
-    mission.date = random_date()
 
+    mission.owner = owner
+
+    i = 1
     for sample in random.sample(list(samples), 3):
         item = SampleMission(
             mission=mission,
             sample=sample,
-            value=random.randint(1, 10)
+            order=i
         )
         item.save()
+        i += 1
 
     mission.save()
 

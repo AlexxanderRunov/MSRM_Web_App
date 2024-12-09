@@ -1,7 +1,6 @@
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin, User
 from django.db import models
-from django.utils import timezone
-
-from django.contrib.auth.models import User
 
 
 class Sample(models.Model):
@@ -10,12 +9,12 @@ class Sample(models.Model):
         (2, 'Удалена'),
     )
 
-    name = models.CharField(max_length=100, verbose_name="Название", blank=True)
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(max_length=500, verbose_name="Описание",)
     status = models.IntegerField(choices=STATUS_CHOICES, default=1, verbose_name="Статус")
-    image = models.ImageField(blank=True, null=True)
-    description = models.TextField(verbose_name="Описание", blank=True)
+    image = models.ImageField(verbose_name="Фото", blank=True, null=True)
 
-    date_discovery = models.DateField(blank=True)
+    date_discovery = models.DateField()
 
     def __str__(self):
         return self.name
@@ -24,6 +23,7 @@ class Sample(models.Model):
         verbose_name = "Образец"
         verbose_name_plural = "Образцы"
         db_table = "samples"
+        ordering = ("pk",)
 
 
 class Mission(models.Model):
@@ -36,15 +36,15 @@ class Mission(models.Model):
     )
 
     status = models.IntegerField(choices=STATUS_CHOICES, default=1, verbose_name="Статус")
-    date_created = models.DateTimeField(default=timezone.now(), verbose_name="Дата создания")
+    date_created = models.DateTimeField(verbose_name="Дата создания", blank=True, null=True)
     date_formation = models.DateTimeField(verbose_name="Дата формирования", blank=True, null=True)
     date_complete = models.DateTimeField(verbose_name="Дата завершения", blank=True, null=True)
 
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Пользователь", null=True, related_name='owner')
-    moderator = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Модератор", null=True, related_name='moderator')
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Создатель", related_name='owner', null=True)
+    moderator = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Модератор", related_name='moderator', blank=True,  null=True)
 
     name = models.CharField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    success = models.BooleanField(blank=True, null=True)
 
     def __str__(self):
         return "Миссия №" + str(self.pk)
@@ -52,14 +52,14 @@ class Mission(models.Model):
     class Meta:
         verbose_name = "Миссия"
         verbose_name_plural = "Миссии"
-        ordering = ('-date_formation',)
         db_table = "missions"
+        ordering = ('-date_formation', )
 
 
 class SampleMission(models.Model):
-    sample = models.ForeignKey(Sample, models.DO_NOTHING, blank=True, null=True)
-    mission = models.ForeignKey(Mission, models.DO_NOTHING, blank=True, null=True)
-    order = models.IntegerField(blank=True, null=True)
+    sample = models.ForeignKey(Sample, on_delete=models.DO_NOTHING, blank=True, null=True)
+    mission = models.ForeignKey(Mission, on_delete=models.DO_NOTHING, blank=True, null=True)
+    order = models.IntegerField(default=0)
 
     def __str__(self):
         return "м-м №" + str(self.pk)
@@ -68,4 +68,7 @@ class SampleMission(models.Model):
         verbose_name = "м-м"
         verbose_name_plural = "м-м"
         db_table = "sample_mission"
-        unique_together = ('sample', 'mission')
+        ordering = ('pk', )
+        constraints = [
+            models.UniqueConstraint(fields=['sample', 'mission'], name="sample_mission_constraint")
+        ]
