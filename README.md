@@ -1,4 +1,4 @@
-#Mars Sample Return Mission
+# Mars Sample Return Mission
 
 Учебный проект, в котором реализована система для автоматизации отправки миссий на Марс, 
 которое состоит из веб-приложения, веб-сервиса и десктопного приложения
@@ -9,4 +9,5 @@
 а кураторам – принимать / отклонять их.
 
 GitHub Pages: https://alexxanderrunov.github.io/MSRM_Web_App_Frontend
+
 Frontend: https://github.com/AlexxanderRunov/MSRM_Web_App_Frontend
